@@ -24,7 +24,7 @@ namespace LoginRegC_.Controllers
         [HttpGet ("Index")]
         public IActionResult Index()
         {
-            return View("Index");
+            return View("LoginRegPage");
         }
 
         [HttpPost ("Register")]
@@ -49,6 +49,12 @@ namespace LoginRegC_.Controllers
         [HttpGet ("Success")]
         public IActionResult Success()
         {
+            int? loggedUserId = HttpContext.Session.GetInt32("LoggedUserId");
+            if (loggedUserId == null)
+            {
+                return RedirectToAction("Login");
+            }
+            ViewBag.User = _context.Users.FirstOrDefault(user => user.UserId == loggedUserId);
             return View();
         }
 
@@ -84,9 +90,17 @@ namespace LoginRegC_.Controllers
 
                 // put userId in session
                 HttpContext.Session.SetInt32("LoggedUserId", userInDb.UserId);
+                
                 return RedirectToAction("Success");
             }
             return View("Login");
+        }
+
+        [HttpGet ("logout")]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
         }
 
 
